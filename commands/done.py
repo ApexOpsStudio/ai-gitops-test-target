@@ -17,21 +17,60 @@ def validate_task_id(tasks, task_id):
     return task_id
 
 
-def mark_done(task_id):
+def mark_done(task_id, json_output=False):
     """Mark a task as complete."""
     tasks_file = get_tasks_file()
     if not tasks_file.exists():
-        print("No tasks found!")
+        if json_output:
+            print(
+                json.dumps(
+                    {"success": False, "command": "done", "error": "No tasks found!"}
+                )
+            )
+        else:
+            print("No tasks found!")
         return
 
     tasks = json.loads(tasks_file.read_text())
-    task_id = validate_task_id(tasks, task_id)
+    try:
+        task_id = validate_task_id(tasks, task_id)
+    except ValueError as exc:
+        if json_output:
+            print(
+                json.dumps(
+                    {"success": False, "command": "done", "error": str(exc)}
+                )
+            )
+            return
+        raise
 
     for task in tasks:
         if task["id"] == task_id:
             task["done"] = True
             tasks_file.write_text(json.dumps(tasks, indent=2))
-            print(f"Marked task {task_id} as done: {task['description']}")
+            if json_output:
+                print(
+                    json.dumps(
+                        {
+                            "success": True,
+                            "command": "done",
+                            "task": {
+                                "id": task_id,
+                                "title": task["description"],
+                                "done": True,
+                            },
+                        }
+                    )
+                )
+            else:
+                print(f"Marked task {task_id} as done: {task['description']}")
             return
 
-    print(f"Task {task_id} not found")
+    if json_output:
+        print(
+            json.dumps(
+                {"success": False, "command": "done", "error": f"Task {task_id} not found"}
+            )
+        )
+    else:
+        print(f"Task {task_id} not found")

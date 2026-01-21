@@ -19,9 +19,19 @@ def validate_description(description):
     return description.strip()
 
 
-def add_task(description):
+def add_task(description, json_output=False):
     """Add a new task."""
-    description = validate_description(description)
+    try:
+        description = validate_description(description)
+    except ValueError as exc:
+        if json_output:
+            print(
+                json.dumps(
+                    {"success": False, "command": "add", "error": str(exc)}
+                )
+            )
+            return
+        raise
 
     tasks_file = get_tasks_file()
     tasks_file.parent.mkdir(parents=True, exist_ok=True)
@@ -34,4 +44,15 @@ def add_task(description):
     tasks.append({"id": task_id, "description": description, "done": False})
 
     tasks_file.write_text(json.dumps(tasks, indent=2))
-    print(f"Added task {task_id}: {description}")
+    if json_output:
+        print(
+            json.dumps(
+                {
+                    "success": True,
+                    "command": "add",
+                    "task": {"id": task_id, "title": description, "done": False},
+                }
+            )
+        )
+    else:
+        print(f"Added task {task_id}: {description}")
