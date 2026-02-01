@@ -10,10 +10,32 @@ from commands.list import list_tasks
 from commands.done import mark_done
 
 
+DEFAULT_CONFIG = """# Default configuration for task CLI
+# Customize at ~/.config/task-cli/config.yaml
+
+# Task storage settings
+storage:
+  format: json
+  max_tasks: 1000
+
+# Display settings
+display:
+  color: true
+  unicode: true
+"""
+
+
 def load_config():
-    """Load configuration from file."""
+    """Load configuration from file, creating default if missing."""
     config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
+    
+    if not config_path.exists():
+        # Create config directory if it doesn't exist
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+        # Write default config
+        config_path.write_text(DEFAULT_CONFIG)
+        print(f"Created default config at: {config_path}")
+    
     with open(config_path) as f:
         return f.read()
 
