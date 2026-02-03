@@ -1,7 +1,6 @@
 """List tasks command."""
 
 import json
-import sys
 from utils.validation import validate_task_file
 
 
@@ -10,7 +9,7 @@ def list_tasks(json_output=False):
     tasks_file = validate_task_file()
     if not tasks_file:
         if json_output:
-            print(json.dumps([]))
+            print("[]")
         else:
             print("No tasks yet!")
         return
@@ -19,7 +18,7 @@ def list_tasks(json_output=False):
 
     if not tasks:
         if json_output:
-            print(json.dumps([]))
+            print("[]")
         else:
             print("No tasks yet!")
         return

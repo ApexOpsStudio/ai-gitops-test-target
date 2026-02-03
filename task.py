@@ -41,6 +41,7 @@ def main():
 
     # List command
     list_parser = subparsers.add_parser("list", help="List all tasks")
+    list_parser.add_argument("--json", action="store_true", help="Output in JSON format")
 
     # Done command
     done_parser = subparsers.add_parser("done", help="Mark task as complete")
@@ -54,7 +55,7 @@ def main():
     if args.command == "add":
         add_task(args.description)
     elif args.command == "list":
-        list_tasks()
+        list_tasks(json_output=args.json)
     elif args.command == "done":
         mark_done(args.task_id)
     else:
