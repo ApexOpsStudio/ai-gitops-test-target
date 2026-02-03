@@ -3,6 +3,7 @@
 
 import argparse
 import sys
+import shutil
 from pathlib import Path
 
 from commands.add import add_task
@@ -12,8 +13,19 @@ from commands.done import mark_done
 
 def load_config():
     """Load configuration from file."""
-    config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
+    config_dir = Path.home() / ".config" / "task-cli"
+    config_path = config_dir / "config.yaml"
+    
+    if not config_path.exists():
+        config_dir.mkdir(parents=True, exist_ok=True)
+        example_path = Path(__file__).parent / "config.yaml.example"
+        if example_path.exists():
+            shutil.copy(example_path, config_path)
+        else:
+            # Fallback if example is missing
+            with open(config_path, "w") as f:
+                f.write("# Default configuration\nstorage:\n  format: json\n")
+                
     with open(config_path) as f:
         return f.read()
 
@@ -34,6 +46,9 @@ def main():
     done_parser.add_argument("task_id", type=int, help="Task ID to mark done")
 
     args = parser.parse_args()
+
+    # Load config to ensure it exists
+    load_config()
 
     if args.command == "add":
         add_task(args.description)
