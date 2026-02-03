@@ -3,8 +3,8 @@
 import json
 import pytest
 from pathlib import Path
-from commands.add import add_task, validate_description
-from commands.done import validate_task_id
+from commands.add import add_task
+from utils.validation import validate_description, validate_task_id
 
 
 def test_validate_description():
@@ -22,9 +22,10 @@ def test_validate_task_id():
     """Test task ID validation."""
     tasks = [{"id": 1}, {"id": 2}]
     assert validate_task_id(tasks, 1) == 1
+    assert validate_task_id(tasks, 2) == 2
 
     with pytest.raises(ValueError):
         validate_task_id(tasks, 0)
 
     with pytest.raises(ValueError):
-        validate_task_id(tasks, 99)
+        validate_task_id(tasks, 3)

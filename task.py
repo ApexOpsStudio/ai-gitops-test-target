@@ -9,12 +9,13 @@ from pathlib import Path
 from commands.add import add_task
 from commands.list import list_tasks
 from commands.done import mark_done
+from utils.paths import get_config_path
 
 
 def load_config():
     """Load configuration from file."""
-    config_dir = Path.home() / ".config" / "task-cli"
-    config_path = config_dir / "config.yaml"
+    config_path = get_config_path()
+    config_dir = config_path.parent
     
     if not config_path.exists():
         config_dir.mkdir(parents=True, exist_ok=True)
