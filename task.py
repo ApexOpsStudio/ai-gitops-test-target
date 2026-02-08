@@ -2,6 +2,7 @@
 """Simple task manager CLI."""
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -18,8 +19,19 @@ def load_config():
         return f.read()
 
 
-def main():
+def _print_json(payload, *, exit_code=0):
+    print(json.dumps(payload, indent=2, sort_keys=True))
+    raise SystemExit(exit_code)
+
+
+def main(argv=None):
     parser = argparse.ArgumentParser(description="Simple task manager")
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Output machine-readable JSON for scripting/automation",
+    )
+
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
     # Add command
@@ -27,22 +39,32 @@ def main():
     add_parser.add_argument("description", help="Task description")
 
     # List command
-    list_parser = subparsers.add_parser("list", help="List all tasks")
+    subparsers.add_parser("list", help="List all tasks")
 
     # Done command
     done_parser = subparsers.add_parser("done", help="Mark task as complete")
     done_parser.add_argument("task_id", type=int, help="Task ID to mark done")
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
-    if args.command == "add":
-        add_task(args.description)
-    elif args.command == "list":
-        list_tasks()
-    elif args.command == "done":
-        mark_done(args.task_id)
-    else:
-        parser.print_help()
+    try:
+        if args.command == "add":
+            result = add_task(args.description, json_output=args.json)
+        elif args.command == "list":
+            result = list_tasks(json_output=args.json)
+        elif args.command == "done":
+            result = mark_done(args.task_id, json_output=args.json)
+        else:
+            parser.print_help()
+            return
+
+        if args.json:
+            _print_json(result, exit_code=0 if result.get("success") else 1)
+
+    except ValueError as e:
+        if args.json:
+            _print_json({"success": False, "error": str(e)}, exit_code=1)
+        raise
 
 
 if __name__ == "__main__":
