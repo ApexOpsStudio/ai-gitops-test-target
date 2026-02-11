@@ -1,35 +1,13 @@
 """List tasks command."""
 
 import json
-from pathlib import Path
 
-
-def get_tasks_file():
-    """Get path to tasks file."""
-    return Path.home() / ".local" / "share" / "task-cli" / "tasks.json"
-
-
-def validate_task_file():
-    """Validate tasks file exists."""
-    # NOTE: Validation logic scattered here - should be in utils (refactor bounty)
-    tasks_file = get_tasks_file()
-    if not tasks_file.exists():
-        return []
-    return tasks_file
+from .utils import load_tasks
 
 
 def list_tasks(json_output=False):
     """List all tasks."""
-    # NOTE: No --json flag support yet (feature bounty)
-    tasks_file = validate_task_file()
-    if not tasks_file:
-        if json_output:
-            print(json.dumps([]))
-        else:
-            print("No tasks yet!")
-        return
-
-    tasks = json.loads(tasks_file.read_text())
+    tasks = load_tasks()
 
     if not tasks:
         if json_output:
