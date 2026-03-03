@@ -1,16 +1,6 @@
-# Task CLI - Test Target for ai-gitops
+# Task CLI
 
-A minimal Python CLI task manager used to test the [ai-gitops](https://github.com/scooke11/ai-gitops) workflow.
-
-## What is this?
-
-This is a **test target repository** - not a real project. It exists solely to validate that our AI-assisted bounty hunting workflow looks professional before we use it on real open-source projects.
-
-## Installation
-
-```bash
-python task.py --help
-```
+A simple command-line task manager.
 
 ## Usage
 
@@ -18,19 +8,37 @@ python task.py --help
 # Add a task
 python task.py add "Buy groceries"
 
-# List tasks
+# List all tasks
 python task.py list
 
-# Complete a task
+# Mark a task as done
 python task.py done 1
 ```
 
-## Testing
+## JSON Output
+
+Add `--json` flag to any command for machine-readable JSON output:
 
 ```bash
-python -m pytest test_task.py
+# Add task with JSON output
+python task.py --json add "Buy groceries"
+# {"status": "added", "task": {"id": 1, "description": "Buy groceries", "done": false}}
+
+# List tasks as JSON
+python task.py --json list
+# {"tasks": [...], "count": 3}
+
+# Mark done with JSON output
+python task.py --json done 1
+# {"status": "done", "task": {"id": 1, "description": "Buy groceries", "done": true}}
 ```
 
 ## Configuration
 
-Copy `config.yaml.example` to `~/.config/task-cli/config.yaml` and customize.
+Config is stored at `~/.config/task-cli/config.yaml`. A default config is created automatically on first run if the file doesn't exist.
+
+## Running Tests
+
+```bash
+pytest test_task.py -v
+```
