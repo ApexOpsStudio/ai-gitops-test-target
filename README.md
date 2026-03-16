@@ -33,4 +33,4 @@ python -m pytest test_task.py
 
 ## Configuration
 
-Copy `config.yaml.example` to `~/.config/task-cli/config.yaml` and customize.
+A default configuration file is automatically created at `~/.config/task-cli/config.yaml` on first run if one does not already exist. To customize, edit this file or copy `config.yaml.example` as a starting point.
