@@ -25,6 +25,24 @@ python task.py list
 python task.py done 1
 ```
 
+### JSON Output
+
+All commands support a `--json` flag for machine-readable output:
+
+```bash
+# Add a task with JSON output
+python task.py add --json "Buy groceries"
+# {"success": true, "message": "Added task 1", "task": {"id": 1, "description": "Buy groceries", "done": false}}
+
+# List tasks in JSON format
+python task.py list --json
+# {"success": true, "tasks": [{"id": 1, "description": "Buy groceries", "done": false}]}
+
+# Mark done with JSON output
+python task.py done --json 1
+# {"success": true, "message": "Marked task 1 as done", "task": {"id": 1, "description": "Buy groceries", "done": true}}
+```
+
 ## Testing
 
 ```bash
