@@ -17,12 +17,17 @@ python task.py --help
 ```bash
 # Add a task
 python task.py add "Buy groceries"
+python task.py add "Buy groceries" --json
 
 # List tasks
 python task.py list
+python task.py list --json
 
 # Complete a task
 python task.py done 1
+
+# Mark done and output JSON
+python task.py done 1 --json
 ```
 
 ## Testing

@@ -13,8 +13,9 @@ from commands.done import mark_done
 def load_config():
     """Load configuration from file."""
     config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
-    with open(config_path) as f:
+    if not config_path.exists():
+        return ""
+    with config_path.open(encoding="utf-8") as f:
         return f.read()
 
 
@@ -25,22 +26,26 @@ def main():
     # Add command
     add_parser = subparsers.add_parser("add", help="Add a new task")
     add_parser.add_argument("description", help="Task description")
+    add_parser.add_argument("--json", action="store_true", help="Output JSON")
 
     # List command
     list_parser = subparsers.add_parser("list", help="List all tasks")
+    list_parser.add_argument("--json", action="store_true", help="Output JSON")
 
     # Done command
     done_parser = subparsers.add_parser("done", help="Mark task as complete")
     done_parser.add_argument("task_id", type=int, help="Task ID to mark done")
+    done_parser.add_argument("--json", action="store_true", help="Output JSON")
 
     args = parser.parse_args()
+    load_config()
 
     if args.command == "add":
-        add_task(args.description)
+        add_task(args.description, json_output=args.json)
     elif args.command == "list":
-        list_tasks()
+        list_tasks(json_output=args.json)
     elif args.command == "done":
-        mark_done(args.task_id)
+        mark_done(args.task_id, json_output=args.json)
     else:
         parser.print_help()
 
