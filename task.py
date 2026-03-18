@@ -11,11 +11,22 @@ from commands.done import mark_done
 
 
 def load_config():
-    """Load configuration from file."""
+    """Load configuration from file.
+
+    Returns a dict with configuration values. If the config file does not
+    exist, returns default configuration instead of crashing.
+    """
     config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
-    with open(config_path) as f:
-        return f.read()
+
+    if not config_path.exists():
+        return {}
+
+    try:
+        with open(config_path) as f:
+            return f.read()
+    except (OSError, PermissionError) as e:
+        print(f"Warning: Could not read config file: {e}", file=sys.stderr)
+        return {}
 
 
 def main():
