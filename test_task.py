@@ -1,10 +1,10 @@
-"""Basic tests for task CLI."""
+"""Tests for task CLI."""
 
 import json
 import pytest
 from pathlib import Path
-from commands.add import add_task, validate_description
-from commands.done import validate_task_id
+
+from commands.utils import validate_description, validate_task_id, get_tasks_file
 
 
 def test_validate_description():
@@ -28,3 +28,10 @@ def test_validate_task_id():
 
     with pytest.raises(ValueError):
         validate_task_id(tasks, 99)
+
+
+def test_get_tasks_file():
+    """Test tasks file path."""
+    path = get_tasks_file()
+    assert path.name == "tasks.json"
+    assert "task-cli" in str(path)
