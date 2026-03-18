@@ -10,37 +10,62 @@ from commands.list import list_tasks
 from commands.done import mark_done
 
 
+DEFAULT_CONFIG = """# Default configuration for task CLI
+storage:
+  format: json
+  max_tasks: 1000
+
+display:
+  color: true
+  unicode: true
+"""
+
+
 def load_config():
-    """Load configuration from file."""
-    config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
+    """Load configuration from file, creating default if missing."""
+    config_dir = Path.home() / ".config" / "task-cli"
+    config_path = config_dir / "config.yaml"
+
+    if not config_path.exists():
+        config_dir.mkdir(parents=True, exist_ok=True)
+        with open(config_path, "w") as f:
+            f.write(DEFAULT_CONFIG)
+        print(f"[task-cli] Created default config at {config_path}")
+
     with open(config_path) as f:
         return f.read()
 
 
 def main():
     parser = argparse.ArgumentParser(description="Simple task manager")
+    parser.add_argument("--json", action="store_true", help="Output as JSON")
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
     # Add command
     add_parser = subparsers.add_parser("add", help="Add a new task")
     add_parser.add_argument("description", help="Task description")
+    add_parser.add_argument("--json", action="store_true", help="Output as JSON")
 
     # List command
     list_parser = subparsers.add_parser("list", help="List all tasks")
+    list_parser.add_argument("--json", action="store_true", help="Output as JSON")
 
     # Done command
     done_parser = subparsers.add_parser("done", help="Mark task as complete")
     done_parser.add_argument("task_id", type=int, help="Task ID to mark done")
+    done_parser.add_argument("--json", action="store_true", help="Output as JSON")
 
     args = parser.parse_args()
 
+    # Check for --json flag at global or subcommand level
+    use_json = getattr(args, "json", False)
+
     if args.command == "add":
-        add_task(args.description)
+        add_task(args.description, use_json=use_json)
     elif args.command == "list":
-        list_tasks()
+        list_tasks(use_json=use_json)
     elif args.command == "done":
-        mark_done(args.task_id)
+        mark_done(args.task_id, use_json=use_json)
     else:
         parser.print_help()
 
