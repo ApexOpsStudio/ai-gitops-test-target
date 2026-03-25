@@ -11,9 +11,30 @@ from commands.done import mark_done
 
 
 def load_config():
-    """Load configuration from file."""
-    config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
+    """Load configuration from file.
+
+    Returns the config contents as a string, or a sensible default config
+    if the file does not exist yet.  A default config file is also created
+    on disk so future runs pick it up automatically.
+    """
+    config_dir = Path.home() / ".config" / "task-cli"
+    config_path = config_dir / "config.yaml"
+
+    if not config_path.exists():
+        # Create a sensible default config
+        default_config = (
+            "# Task CLI configuration\n"
+            "storage:\n"
+            "  format: json\n"
+            "  max_tasks: 1000\n"
+            "display:\n"
+            "  color: true\n"
+            "  unicode: true\n"
+        )
+        config_dir.mkdir(parents=True, exist_ok=True)
+        config_path.write_text(default_config)
+        return default_config
+
     with open(config_path) as f:
         return f.read()
 
