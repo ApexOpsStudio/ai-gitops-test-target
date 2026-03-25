@@ -8,12 +8,12 @@ from pathlib import Path
 from commands.add import add_task
 from commands.list import list_tasks
 from commands.done import mark_done
+from utils.paths import get_config_path
 
 
 def load_config():
     """Load configuration from file."""
-    config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
+    config_path = get_config_path()
     with open(config_path) as f:
         return f.read()
 
