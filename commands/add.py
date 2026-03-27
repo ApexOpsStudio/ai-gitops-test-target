@@ -1,22 +1,9 @@
 """Add task command."""
 
 import json
-from pathlib import Path
 
-
-def get_tasks_file():
-    """Get path to tasks file."""
-    return Path.home() / ".local" / "share" / "task-cli" / "tasks.json"
-
-
-def validate_description(description):
-    """Validate task description."""
-    # NOTE: Validation logic scattered here - should be in utils (refactor bounty)
-    if not description:
-        raise ValueError("Description cannot be empty")
-    if len(description) > 200:
-        raise ValueError("Description too long (max 200 chars)")
-    return description.strip()
+from utils.paths import get_tasks_file
+from utils.validation import validate_description
 
 
 def add_task(description):
