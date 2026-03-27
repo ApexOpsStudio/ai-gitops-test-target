@@ -13,7 +13,10 @@ from commands.done import mark_done
 def load_config():
     """Load configuration from file."""
     config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
+    if not config_path.exists():
+        raise FileNotFoundError(
+            f"Config not found at {config_path}. Copy config.yaml.example to this location to get started."
+        )
     with open(config_path) as f:
         return f.read()
 
@@ -34,6 +37,12 @@ def main():
     done_parser.add_argument("task_id", type=int, help="Task ID to mark done")
 
     args = parser.parse_args()
+
+    try:
+        load_config()
+    except FileNotFoundError as e:
+        print(str(e), file=sys.stderr)
+        sys.exit(1)
 
     if args.command == "add":
         add_task(args.description)
