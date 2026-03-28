@@ -8,14 +8,7 @@ from pathlib import Path
 from commands.add import add_task
 from commands.list import list_tasks
 from commands.done import mark_done
-
-
-def load_config():
-    """Load configuration from file."""
-    config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
-    with open(config_path) as f:
-        return f.read()
+from utils.paths import load_config
 
 
 def main():
@@ -34,6 +27,12 @@ def main():
     done_parser.add_argument("task_id", type=int, help="Task ID to mark done")
 
     args = parser.parse_args()
+
+    # Load config gracefully - don't crash if missing
+    config = load_config()
+    if config is None:
+        print("Warning: No config file found at ~/.config/task-cli/config.yaml")
+        print("Using default settings. Create a config file to customize behavior.")
 
     if args.command == "add":
         add_task(args.description)
