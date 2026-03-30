@@ -1,37 +1,37 @@
-"""Mark task done command."""
+"""Command to mark a task as done."""
 
-import json
-from pathlib import Path
-
-
-def get_tasks_file():
-    """Get path to tasks file."""
-    return Path.home() / ".local" / "share" / "task-cli" / "tasks.json"
+from utils.paths import get_tasks_file
+from utils.validation import validate_task_file, validate_task_id
 
 
-def validate_task_id(tasks, task_id):
-    """Validate task ID exists."""
-    # NOTE: Validation logic scattered here - should be in utils (refactor bounty)
-    if task_id < 1 or task_id > len(tasks):
-        raise ValueError(f"Invalid task ID: {task_id}")
-    return task_id
+def mark_done(task_id: str) -> None:
+    """Mark the task with the given ID as done (removes it from the list).
 
+    Args:
+        task_id: The 1-based index of the task to mark as done.
 
-def mark_done(task_id):
-    """Mark a task as complete."""
+    Raises:
+        ValueError: If the task ID is not a valid positive integer or out of range.
+        FileNotFoundError: If the tasks file does not exist.
+    """
+    tid = validate_task_id(task_id)
+
     tasks_file = get_tasks_file()
-    if not tasks_file.exists():
-        print("No tasks found!")
-        return
+    validate_task_file(tasks_file)
 
-    tasks = json.loads(tasks_file.read_text())
-    task_id = validate_task_id(tasks, task_id)
+    with open(tasks_file, "r") as f:
+        lines = f.readlines()
 
-    for task in tasks:
-        if task["id"] == task_id:
-            task["done"] = True
-            tasks_file.write_text(json.dumps(tasks, indent=2))
-            print(f"Marked task {task_id} as done: {task['description']}")
-            return
+    tasks = [line for line in lines if line.strip()]
 
-    print(f"Task {task_id} not found")
+    if tid > len(tasks):
+        raise ValueError(
+            f"Task ID {tid} is out of range. There are only {len(tasks)} task(s)."
+        )
+
+    completed_task = tasks.pop(tid - 1).strip()
+
+    with open(tasks_file, "w") as f:
+        f.writelines(tasks)
+
+    print(f"Task {tid} marked as done: {completed_task}")

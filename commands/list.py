@@ -1,37 +1,26 @@
-"""List tasks command."""
+"""Command to list all tasks."""
 
-import json
-from pathlib import Path
-
-
-def get_tasks_file():
-    """Get path to tasks file."""
-    return Path.home() / ".local" / "share" / "task-cli" / "tasks.json"
+from utils.paths import get_tasks_file
+from utils.validation import validate_task_file
 
 
-def validate_task_file():
-    """Validate tasks file exists."""
-    # NOTE: Validation logic scattered here - should be in utils (refactor bounty)
+def list_tasks() -> None:
+    """List all tasks from the tasks file.
+
+    Raises:
+        FileNotFoundError: If the tasks file does not exist.
+    """
     tasks_file = get_tasks_file()
-    if not tasks_file.exists():
-        return []
-    return tasks_file
+    validate_task_file(tasks_file)
 
+    with open(tasks_file, "r") as f:
+        lines = f.readlines()
 
-def list_tasks():
-    """List all tasks."""
-    # NOTE: No --json flag support yet (feature bounty)
-    tasks_file = validate_task_file()
-    if not tasks_file:
-        print("No tasks yet!")
+    if not lines:
+        print("No tasks found.")
         return
 
-    tasks = json.loads(tasks_file.read_text())
-
-    if not tasks:
-        print("No tasks yet!")
-        return
-
-    for task in tasks:
-        status = "✓" if task["done"] else " "
-        print(f"[{status}] {task['id']}. {task['description']}")
+    for index, line in enumerate(lines, start=1):
+        task = line.strip()
+        if task:
+            print(f"{index}. {task}")
