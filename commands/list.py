@@ -18,20 +18,28 @@ def validate_task_file():
     return tasks_file
 
 
-def list_tasks():
+def list_tasks(json_output=False):
     """List all tasks."""
-    # NOTE: No --json flag support yet (feature bounty)
     tasks_file = validate_task_file()
     if not tasks_file:
-        print("No tasks yet!")
+        if json_output:
+            print(json.dumps({"success": True, "message": "No tasks yet", "data": []}))
+        else:
+            print("No tasks yet!")
         return
 
     tasks = json.loads(tasks_file.read_text())
 
     if not tasks:
-        print("No tasks yet!")
+        if json_output:
+            print(json.dumps({"success": True, "message": "No tasks yet", "data": []}))
+        else:
+            print("No tasks yet!")
         return
 
-    for task in tasks:
-        status = "✓" if task["done"] else " "
-        print(f"[{status}] {task['id']}. {task['description']}")
+    if json_output:
+        print(json.dumps({"success": True, "message": f"{len(tasks)} task(s)", "data": tasks}))
+    else:
+        for task in tasks:
+            status = "✓" if task["done"] else " "
+            print(f"[{status}] {task['id']}. {task['description']}")
