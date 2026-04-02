@@ -23,6 +23,23 @@ python task.py list
 
 # Complete a task
 python task.py done 1
+
+# JSON output (for scripting and automation)
+python task.py --json add "Buy groceries"
+python task.py --json list
+python task.py --json done 1
+```
+
+### JSON Output Format
+
+When using the `--json` flag, all commands return a consistent JSON envelope:
+
+```json
+{
+  "success": true,
+  "message": "Added task 1",
+  "data": {"id": 1, "description": "Buy groceries", "done": false}
+}
 ```
 
 ## Testing
