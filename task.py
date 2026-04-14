@@ -11,11 +11,29 @@ from commands.done import mark_done
 
 
 def load_config():
-    """Load configuration from file."""
+    """Load configuration from file. Returns None if config is missing."""
     config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
-    with open(config_path) as f:
-        return f.read()
+    if not config_path.exists():
+        return None
+    try:
+        with open(config_path) as f:
+            return f.read()
+    except Exception:
+        return None
+
+
+def ensure_config():
+    """Ensure config file exists with defaults, otherwise create it."""
+    config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
+    if not config_path.exists():
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+        # Copy from example if available
+        example = Path(__file__).parent / "config.yaml.example"
+        if example.exists():
+            import shutil
+            shutil.copy(example, config_path)
+        else:
+            config_path.write_text("# Default config\n# Add your settings here\n")
 
 
 def main():
@@ -36,10 +54,13 @@ def main():
     args = parser.parse_args()
 
     if args.command == "add":
+        ensure_config()
         add_task(args.description)
     elif args.command == "list":
+        ensure_config()
         list_tasks()
     elif args.command == "done":
+        ensure_config()
         mark_done(args.task_id)
     else:
         parser.print_help()
