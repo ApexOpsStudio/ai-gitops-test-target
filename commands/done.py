@@ -17,10 +17,13 @@ def validate_task_id(tasks, task_id):
     return task_id
 
 
-def mark_done(task_id):
+def mark_done(task_id, json_output=False):
     """Mark a task as complete."""
     tasks_file = get_tasks_file()
     if not tasks_file.exists():
+        if json_output:
+            print(json.dumps({"success": False, "error": "No tasks found!"}))
+            return
         print("No tasks found!")
         return
 
@@ -31,7 +34,17 @@ def mark_done(task_id):
         if task["id"] == task_id:
             task["done"] = True
             tasks_file.write_text(json.dumps(tasks, indent=2))
+            if json_output:
+                print(json.dumps({
+                    "success": True,
+                    "message": f"Marked task {task_id} as done: {task['description']}",
+                    "task": task,
+                }))
+                return
             print(f"Marked task {task_id} as done: {task['description']}")
             return
 
+    if json_output:
+        print(json.dumps({"success": False, "error": f"Task {task_id} not found"}))
+        return
     print(f"Task {task_id} not found")

@@ -18,11 +18,38 @@ python task.py --help
 # Add a task
 python task.py add "Buy groceries"
 
+# Add a task with JSON output
+python task.py add "Buy groceries" --json
+
 # List tasks
 python task.py list
 
+# List tasks with JSON output
+python task.py list --json
+
 # Complete a task
 python task.py done 1
+
+# Complete a task with JSON output
+python task.py done 1 --json
+```
+
+### JSON Output Examples
+
+```bash
+python task.py add "Buy groceries" --json
+```
+
+```json
+{"success": true, "message": "Added task 1: Buy groceries", "task": {"id": 1, "description": "Buy groceries", "done": false}}
+```
+
+```bash
+python task.py list --json
+```
+
+```json
+{"success": true, "tasks": [{"id": 1, "description": "Buy groceries", "done": false}]}
 ```
 
 ## Testing
