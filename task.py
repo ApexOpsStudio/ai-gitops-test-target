@@ -20,6 +20,7 @@ def load_config():
 
 def main():
     parser = argparse.ArgumentParser(description="Simple task manager")
+    parser.add_argument("--json", action="store_true", help="Output in JSON format")
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
     # Add command
@@ -34,13 +35,14 @@ def main():
     done_parser.add_argument("task_id", type=int, help="Task ID to mark done")
 
     args = parser.parse_args()
+    as_json = getattr(args, "json", False)
 
     if args.command == "add":
-        add_task(args.description)
+        add_task(args.description, as_json=as_json)
     elif args.command == "list":
-        list_tasks()
+        list_tasks(as_json=as_json)
     elif args.command == "done":
-        mark_done(args.task_id)
+        mark_done(args.task_id, as_json=as_json)
     else:
         parser.print_help()
 
