@@ -2,6 +2,7 @@
 """Simple task manager CLI."""
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -9,12 +10,40 @@ from commands.add import add_task
 from commands.list import list_tasks
 from commands.done import mark_done
 
+# Module-level config paths (can be overridden for testing)
+CONFIG_DIR = Path.home() / ".config" / "task-cli"
+CONFIG_PATH = CONFIG_DIR / "config.yaml"
+
+DEFAULT_CONFIG = """# Default configuration for task CLI
+# Auto-created if not present
+
+# Task storage settings
+storage:
+  format: json
+  max_tasks: 1000
+
+# Display settings
+display:
+  color: true
+  unicode: true
+"""
+
 
 def load_config():
-    """Load configuration from file."""
-    config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
-    with open(config_path) as f:
+    """Load configuration from file. Creates default if missing."""
+    global CONFIG_PATH, CONFIG_DIR
+    
+    if not CONFIG_PATH.exists():
+        # Create default config directory and file
+        try:
+            CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+            CONFIG_PATH.write_text(DEFAULT_CONFIG)
+            print(f"Created default config at {CONFIG_PATH}", file=sys.stderr)
+        except OSError as e:
+            print(f"Error: Could not create config file at {CONFIG_PATH}: {e}", file=sys.stderr)
+            sys.exit(1)
+    
+    with open(CONFIG_PATH) as f:
         return f.read()
 
 
