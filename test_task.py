@@ -28,3 +28,47 @@ def test_validate_task_id():
 
     with pytest.raises(ValueError):
         validate_task_id(tasks, 99)
+
+
+def test_add_task_json_output(monkeypatch, tmp_path, capsys):
+    """Add command can emit parseable JSON."""
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+
+    add_task("Write tests", json_output=True)
+
+    output = json.loads(capsys.readouterr().out)
+    assert output == {
+        "status": "added",
+        "task": {"id": 1, "description": "Write tests", "done": False},
+    }
+
+
+def test_list_tasks_json_output(monkeypatch, tmp_path, capsys):
+    """List command can emit parseable JSON."""
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+    add_task("Ship JSON")
+    capsys.readouterr()
+
+    from commands.list import list_tasks
+
+    list_tasks(json_output=True)
+
+    output = json.loads(capsys.readouterr().out)
+    assert output == {"tasks": [{"id": 1, "description": "Ship JSON", "done": False}]}
+
+
+def test_done_task_json_output(monkeypatch, tmp_path, capsys):
+    """Done command can emit parseable JSON."""
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+    add_task("Complete me")
+    capsys.readouterr()
+
+    from commands.done import mark_done
+
+    mark_done(1, json_output=True)
+
+    output = json.loads(capsys.readouterr().out)
+    assert output == {
+        "status": "done",
+        "task": {"id": 1, "description": "Complete me", "done": True},
+    }

@@ -25,6 +25,16 @@ python task.py list
 python task.py done 1
 ```
 
+### JSON output
+
+Every command supports `--json` for scripting and automation:
+
+```bash
+python task.py add "Buy groceries" --json
+python task.py list --json
+python task.py done 1 --json
+```
+
 ## Testing
 
 ```bash
