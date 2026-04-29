@@ -10,12 +10,32 @@ from commands.list import list_tasks
 from commands.done import mark_done
 
 
+DEFAULT_CONFIG = """# Task CLI configuration
+
+storage:
+  format: json
+  max_tasks: 1000
+
+display:
+  color: true
+  unicode: true
+"""
+
+
+def get_config_path():
+    """Return the default task-cli config path."""
+    return Path.home() / ".config" / "task-cli" / "config.yaml"
+
+
 def load_config():
-    """Load configuration from file."""
-    config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
-    with open(config_path) as f:
-        return f.read()
+    """Load configuration from file, creating a default one if needed."""
+    config_path = get_config_path()
+
+    if not config_path.exists():
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+        config_path.write_text(DEFAULT_CONFIG)
+
+    return config_path.read_text()
 
 
 def main():
@@ -34,6 +54,8 @@ def main():
     done_parser.add_argument("task_id", type=int, help="Task ID to mark done")
 
     args = parser.parse_args()
+
+    load_config()
 
     if args.command == "add":
         add_task(args.description)
