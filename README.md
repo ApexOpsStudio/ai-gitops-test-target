@@ -34,3 +34,14 @@ python -m pytest test_task.py
 ## Configuration
 
 Copy `config.yaml.example` to `~/.config/task-cli/config.yaml` and customize.
+
+
+## JSON output
+
+All commands support `--json` for scripting:
+
+```bash
+python task.py add "Buy groceries" --json
+python task.py list --json
+python task.py done 1 --json
+```
