@@ -25,6 +25,19 @@ python task.py list
 python task.py done 1
 ```
 
+## JSON output
+
+Use `--json` before or after the command to make output parseable by scripts:
+
+```bash
+python task.py --json add "Buy groceries"
+python task.py list --json
+python task.py done 1 --json
+```
+
+When the config file is missing, the CLI creates a default config at
+`~/.config/task-cli/config.yaml` instead of crashing.
+
 ## Testing
 
 ```bash
