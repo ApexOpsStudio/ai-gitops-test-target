@@ -11,11 +11,15 @@ from commands.done import mark_done
 
 
 def load_config():
-    """Load configuration from file."""
+    """Load configuration from file, creating a default one when missing."""
     config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
-    with open(config_path) as f:
-        return f.read()
+    if not config_path.exists():
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+        default_config = "# Task CLI configuration\n"
+        config_path.write_text(default_config)
+        return default_config
+
+    return config_path.read_text()
 
 
 def main():
@@ -34,6 +38,8 @@ def main():
     done_parser.add_argument("task_id", type=int, help="Task ID to mark done")
 
     args = parser.parse_args()
+
+    load_config()
 
     if args.command == "add":
         add_task(args.description)
