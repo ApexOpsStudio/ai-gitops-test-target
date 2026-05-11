@@ -25,6 +25,19 @@ python task.py list
 python task.py done 1
 ```
 
+## JSON Output
+
+```bash
+python task.py add "Buy groceries" --json
+# {"task": {"id": 1, "description": "Buy groceries", "done": false}}
+
+python task.py list --json
+# [{"id": 1, "description": "Buy groceries", "done": false}]
+
+python task.py done 1 --json
+# {"task": {"id": 1, "description": "Buy groceries", "done": true}}
+```
+
 ## Testing
 
 ```bash
