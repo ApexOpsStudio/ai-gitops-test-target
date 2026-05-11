@@ -25,6 +25,21 @@ python task.py list
 python task.py done 1
 ```
 
+## JSON Output
+
+Pass `--json` to any command to emit parseable JSON for scripting and automation.
+
+```bash
+python task.py add "Buy groceries" --json
+# {"action": "added", "task": {"id": 1, "description": "Buy groceries", "done": false}}
+
+python task.py list --json
+# {"tasks": [{"id": 1, "description": "Buy groceries", "done": false}]}
+
+python task.py done 1 --json
+# {"action": "completed", "task": {"id": 1, "description": "Buy groceries", "done": true}}
+```
+
 ## Testing
 
 ```bash
