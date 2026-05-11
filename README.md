@@ -14,6 +14,8 @@ python task.py --help
 
 ## Usage
 
+### Human-readable output (default)
+
 ```bash
 # Add a task
 python task.py add "Buy groceries"
@@ -23,6 +25,39 @@ python task.py list
 
 # Complete a task
 python task.py done 1
+```
+
+### JSON output (for scripting/automation)
+
+```bash
+# Add a task (JSON output)
+python task.py --json add "Buy groceries"
+
+# List tasks (JSON output)
+python task.py --json list
+
+# Complete a task (JSON output)
+python task.py --json done 1
+```
+
+**Note:** The `--json` flag must come **before** the subcommand.
+
+### JSON Output Format
+
+All commands with `--json` output valid JSON:
+
+```json
+{
+  "success": true,
+  "tasks": [
+    {
+      "id": 1,
+      "description": "Buy groceries",
+      "done": false
+    }
+  ],
+  "count": 1
+}
 ```
 
 ## Testing

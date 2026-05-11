@@ -11,18 +11,18 @@ def get_tasks_file():
 
 def validate_task_id(tasks, task_id):
     """Validate task ID exists."""
-    # NOTE: Validation logic scattered here - should be in utils (refactor bounty)
     if task_id < 1 or task_id > len(tasks):
         raise ValueError(f"Invalid task ID: {task_id}")
     return task_id
 
 
-def mark_done(task_id):
-    """Mark a task as complete."""
+def mark_done(task_id, json_output=False):
+    """Mark a task as complete. Returns result dict for JSON output."""
     tasks_file = get_tasks_file()
     if not tasks_file.exists():
-        print("No tasks found!")
-        return
+        if not json_output:
+            print("No tasks found!")
+        return {"success": False, "error": "No tasks found"}
 
     tasks = json.loads(tasks_file.read_text())
     task_id = validate_task_id(tasks, task_id)
@@ -31,7 +31,10 @@ def mark_done(task_id):
         if task["id"] == task_id:
             task["done"] = True
             tasks_file.write_text(json.dumps(tasks, indent=2))
-            print(f"Marked task {task_id} as done: {task['description']}")
-            return
+            if not json_output:
+                print(f"Marked task {task_id} as done: {task['description']}")
+            return {"success": True, "task_id": task_id, "description": task["description"], "done": True}
 
-    print(f"Task {task_id} not found")
+    if not json_output:
+        print(f"Task {task_id} not found")
+    return {"success": False, "error": f"Task {task_id} not found"}

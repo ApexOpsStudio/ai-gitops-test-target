@@ -11,27 +11,30 @@ def get_tasks_file():
 
 def validate_task_file():
     """Validate tasks file exists."""
-    # NOTE: Validation logic scattered here - should be in utils (refactor bounty)
     tasks_file = get_tasks_file()
     if not tasks_file.exists():
         return []
     return tasks_file
 
 
-def list_tasks():
-    """List all tasks."""
-    # NOTE: No --json flag support yet (feature bounty)
+def list_tasks(json_output=False):
+    """List all tasks. Returns result dict for JSON output."""
     tasks_file = validate_task_file()
     if not tasks_file:
-        print("No tasks yet!")
-        return
+        if not json_output:
+            print("No tasks yet!")
+        return {"success": True, "tasks": [], "count": 0}
 
     tasks = json.loads(tasks_file.read_text())
 
     if not tasks:
-        print("No tasks yet!")
-        return
+        if not json_output:
+            print("No tasks yet!")
+        return {"success": True, "tasks": [], "count": 0}
 
-    for task in tasks:
-        status = "✓" if task["done"] else " "
-        print(f"[{status}] {task['id']}. {task['description']}")
+    if not json_output:
+        for task in tasks:
+            status = "✓" if task["done"] else " "
+            print(f"[{status}] {task['id']}. {task['description']}")
+
+    return {"success": True, "tasks": tasks, "count": len(tasks)}

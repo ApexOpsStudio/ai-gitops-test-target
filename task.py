@@ -2,6 +2,7 @@
 """Simple task manager CLI."""
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -13,13 +14,13 @@ from commands.done import mark_done
 def load_config():
     """Load configuration from file."""
     config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
     with open(config_path) as f:
         return f.read()
 
 
 def main():
     parser = argparse.ArgumentParser(description="Simple task manager")
+    parser.add_argument("--json", action="store_true", help="Output in JSON format")
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
     # Add command
@@ -36,11 +37,17 @@ def main():
     args = parser.parse_args()
 
     if args.command == "add":
-        add_task(args.description)
+        result = add_task(args.description, json_output=args.json)
+        if args.json:
+            print(json.dumps(result, indent=2))
     elif args.command == "list":
-        list_tasks()
+        result = list_tasks(json_output=args.json)
+        if args.json:
+            print(json.dumps(result, indent=2))
     elif args.command == "done":
-        mark_done(args.task_id)
+        result = mark_done(args.task_id, json_output=args.json)
+        if args.json:
+            print(json.dumps(result, indent=2))
     else:
         parser.print_help()
 
