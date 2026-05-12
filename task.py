@@ -10,16 +10,30 @@ from commands.list import list_tasks
 from commands.done import mark_done
 
 
+DEFAULT_CONFIG = """\
+# Task CLI configuration
+storage:
+  format: json
+  max_tasks: 1000
+
+display:
+  color: true
+  unicode: true
+"""
+
+
 def load_config():
-    """Load configuration from file."""
+    """Load configuration from file, creating default if missing."""
     config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
-    with open(config_path) as f:
-        return f.read()
+    if not config_path.exists():
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+        config_path.write_text(DEFAULT_CONFIG)
+    return config_path.read_text()
 
 
 def main():
     parser = argparse.ArgumentParser(description="Simple task manager")
+    parser.add_argument("--json", action="store_true", help="Output in JSON format")
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
     # Add command
@@ -35,12 +49,14 @@ def main():
 
     args = parser.parse_args()
 
+    json_output = args.json
+
     if args.command == "add":
-        add_task(args.description)
+        add_task(args.description, json_output=json_output)
     elif args.command == "list":
-        list_tasks()
+        list_tasks(json_output=json_output)
     elif args.command == "done":
-        mark_done(args.task_id)
+        mark_done(args.task_id, json_output=json_output)
     else:
         parser.print_help()
 
