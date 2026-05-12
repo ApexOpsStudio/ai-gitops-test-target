@@ -5,6 +5,7 @@ import pytest
 from pathlib import Path
 from commands.add import add_task, validate_description
 from commands.done import validate_task_id
+from task import DEFAULT_CONFIG, load_config
 
 
 def test_validate_description():
@@ -28,3 +29,13 @@ def test_validate_task_id():
 
     with pytest.raises(ValueError):
         validate_task_id(tasks, 99)
+
+
+def test_load_config_creates_default_when_missing(monkeypatch, tmp_path):
+    """Test missing config file is created with defaults."""
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+    config_path = tmp_path / ".config" / "task-cli" / "config.yaml"
+
+    assert load_config() == DEFAULT_CONFIG
+    assert config_path.exists()
+    assert config_path.read_text() == DEFAULT_CONFIG
