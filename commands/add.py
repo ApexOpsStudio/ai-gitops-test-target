@@ -35,3 +35,22 @@ def add_task(description):
 
     tasks_file.write_text(json.dumps(tasks, indent=2))
     print(f"Added task {task_id}: {description}")
+
+
+def add_task_json(description):
+    """Add a new task and print a JSON response."""
+    description = validate_description(description)
+
+    tasks_file = get_tasks_file()
+    tasks_file.parent.mkdir(parents=True, exist_ok=True)
+
+    tasks = []
+    if tasks_file.exists():
+        tasks = json.loads(tasks_file.read_text())
+
+    task_id = len(tasks) + 1
+    task = {"id": task_id, "description": description, "done": False}
+    tasks.append(task)
+
+    tasks_file.write_text(json.dumps(tasks, indent=2))
+    print(json.dumps({"message": f"Added task {task_id}", "task": task}))

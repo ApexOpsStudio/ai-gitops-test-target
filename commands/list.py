@@ -35,3 +35,14 @@ def list_tasks():
     for task in tasks:
         status = "✓" if task["done"] else " "
         print(f"[{status}] {task['id']}. {task['description']}")
+
+
+def list_tasks_json():
+    """List all tasks as JSON."""
+    tasks_file = validate_task_file()
+    if not tasks_file:
+        print(json.dumps({"tasks": []}))
+        return
+
+    tasks = json.loads(tasks_file.read_text())
+    print(json.dumps({"tasks": tasks}))
