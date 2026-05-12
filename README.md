@@ -23,6 +23,15 @@ python task.py list
 
 # Complete a task
 python task.py done 1
+
+# Add a task and return JSON
+python task.py add --json "Buy groceries"
+
+# List tasks as JSON
+python task.py list --json
+
+# Complete a task and return JSON
+python task.py done --json 1
 ```
 
 ## Testing

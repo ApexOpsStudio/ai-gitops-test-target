@@ -35,3 +35,23 @@ def mark_done(task_id):
             return
 
     print(f"Task {task_id} not found")
+
+
+def mark_done_json(task_id):
+    """Mark a task as complete and print a JSON response."""
+    tasks_file = get_tasks_file()
+    if not tasks_file.exists():
+        print(json.dumps({"error": "No tasks found"}))
+        return
+
+    tasks = json.loads(tasks_file.read_text())
+    task_id = validate_task_id(tasks, task_id)
+
+    for task in tasks:
+        if task["id"] == task_id:
+            task["done"] = True
+            tasks_file.write_text(json.dumps(tasks, indent=2))
+            print(json.dumps({"message": f"Marked task {task_id} as done", "task": task}))
+            return
+
+    print(json.dumps({"error": f"Task {task_id} not found"}))
