@@ -11,7 +11,6 @@ def get_tasks_file():
 
 def validate_description(description):
     """Validate task description."""
-    # NOTE: Validation logic scattered here - should be in utils (refactor bounty)
     if not description:
         raise ValueError("Description cannot be empty")
     if len(description) > 200:
@@ -19,7 +18,7 @@ def validate_description(description):
     return description.strip()
 
 
-def add_task(description):
+def add_task(description, json_output=False):
     """Add a new task."""
     description = validate_description(description)
 
@@ -31,7 +30,12 @@ def add_task(description):
         tasks = json.loads(tasks_file.read_text())
 
     task_id = len(tasks) + 1
-    tasks.append({"id": task_id, "description": description, "done": False})
+    task = {"id": task_id, "description": description, "done": False}
+    tasks.append(task)
 
     tasks_file.write_text(json.dumps(tasks, indent=2))
-    print(f"Added task {task_id}: {description}")
+
+    if json_output:
+        print(json.dumps({"status": "added", "task": task}))
+    else:
+        print(f"Added task {task_id}: {description}")
