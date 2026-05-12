@@ -3,8 +3,8 @@
 import json
 import pytest
 from pathlib import Path
-from commands.add import add_task, validate_description
-from commands.done import validate_task_id
+from utils.validation import validate_description, validate_task_id, validate_task_file
+from utils.paths import get_tasks_file
 
 
 def test_validate_description():
@@ -28,3 +28,23 @@ def test_validate_task_id():
 
     with pytest.raises(ValueError):
         validate_task_id(tasks, 99)
+
+
+def test_validate_task_file_missing(tmp_path):
+    """Test validate_task_file with missing file."""
+    missing = tmp_path / "nonexistent.json"
+    assert validate_task_file(missing) == []
+
+
+def test_validate_task_file_exists(tmp_path):
+    """Test validate_task_file with existing file."""
+    existing = tmp_path / "tasks.json"
+    existing.write_text("[]")
+    assert validate_task_file(existing) == existing
+
+
+def test_get_tasks_file():
+    """Test get_tasks_file returns expected path."""
+    result = get_tasks_file()
+    assert result.name == "tasks.json"
+    assert "task-cli" in str(result)
