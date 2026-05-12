@@ -23,6 +23,49 @@ python task.py list
 
 # Complete a task
 python task.py done 1
+
+# Machine-readable JSON output for scripting
+python task.py add "Buy groceries" --json
+python task.py list --json
+python task.py done 1 --json
+```
+
+JSON responses use a consistent envelope:
+
+```json
+{
+  "success": true,
+  "message": "Added task 1: Buy groceries",
+  "data": {
+    "task": {
+      "id": 1,
+      "description": "Buy groceries",
+      "done": false
+    }
+  }
+}
+```
+
+For commands that return multiple tasks, the payload is available under `data.tasks`:
+
+```bash
+python task.py list --json
+```
+
+```json
+{
+  "success": true,
+  "message": "Found 1 task",
+  "data": {
+    "tasks": [
+      {
+        "id": 1,
+        "description": "Buy groceries",
+        "done": false
+      }
+    ]
+  }
+}
 ```
 
 ## Testing

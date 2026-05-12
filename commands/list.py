@@ -3,6 +3,8 @@
 import json
 from pathlib import Path
 
+from commands.output import emit_json
+
 
 def get_tasks_file():
     """Get path to tasks file."""
@@ -18,20 +20,30 @@ def validate_task_file():
     return tasks_file
 
 
-def list_tasks():
+def list_tasks(json_output=False):
     """List all tasks."""
-    # NOTE: No --json flag support yet (feature bounty)
     tasks_file = validate_task_file()
     if not tasks_file:
-        print("No tasks yet!")
-        return
+        if json_output:
+            emit_json({"success": True, "message": "No tasks yet!", "data": {"tasks": []}})
+        else:
+            print("No tasks yet!")
+        return []
 
     tasks = json.loads(tasks_file.read_text())
 
     if not tasks:
-        print("No tasks yet!")
-        return
+        if json_output:
+            emit_json({"success": True, "message": "No tasks yet!", "data": {"tasks": []}})
+        else:
+            print("No tasks yet!")
+        return []
 
-    for task in tasks:
-        status = "✓" if task["done"] else " "
-        print(f"[{status}] {task['id']}. {task['description']}")
+    if json_output:
+        task_word = "task" if len(tasks) == 1 else "tasks"
+        emit_json({"success": True, "message": f"Found {len(tasks)} {task_word}", "data": {"tasks": tasks}})
+    else:
+        for task in tasks:
+            status = "✓" if task["done"] else " "
+            print(f"[{status}] {task['id']}. {task['description']}")
+    return tasks

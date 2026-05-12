@@ -3,6 +3,8 @@
 import json
 from pathlib import Path
 
+from commands.output import emit_json
+
 
 def get_tasks_file():
     """Get path to tasks file."""
@@ -19,7 +21,7 @@ def validate_description(description):
     return description.strip()
 
 
-def add_task(description):
+def add_task(description, json_output=False):
     """Add a new task."""
     description = validate_description(description)
 
@@ -31,7 +33,13 @@ def add_task(description):
         tasks = json.loads(tasks_file.read_text())
 
     task_id = len(tasks) + 1
-    tasks.append({"id": task_id, "description": description, "done": False})
+    task = {"id": task_id, "description": description, "done": False}
+    tasks.append(task)
 
     tasks_file.write_text(json.dumps(tasks, indent=2))
-    print(f"Added task {task_id}: {description}")
+    message = f"Added task {task_id}: {description}"
+    if json_output:
+        emit_json({"success": True, "message": message, "data": {"task": task}})
+    else:
+        print(message)
+    return task
