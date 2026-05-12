@@ -4,7 +4,8 @@ import json
 import pytest
 from pathlib import Path
 from commands.add import add_task, validate_description
-from commands.done import validate_task_id
+from commands.done import mark_done, validate_task_id
+from commands.list import list_tasks
 
 
 def test_validate_description():
@@ -28,3 +29,37 @@ def test_validate_task_id():
 
     with pytest.raises(ValueError):
         validate_task_id(tasks, 99)
+
+
+def test_add_task_json_output(monkeypatch, tmp_path, capsys):
+    """Test add command JSON output."""
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+
+    add_task("Buy groceries", json_output=True)
+
+    output = json.loads(capsys.readouterr().out)
+    assert output == {"task": {"id": 1, "description": "Buy groceries", "done": False}}
+
+
+def test_list_tasks_json_output(monkeypatch, tmp_path, capsys):
+    """Test list command JSON output."""
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+    add_task("Buy groceries")
+    capsys.readouterr()
+
+    list_tasks(json_output=True)
+
+    output = json.loads(capsys.readouterr().out)
+    assert output == {"tasks": [{"id": 1, "description": "Buy groceries", "done": False}]}
+
+
+def test_done_task_json_output(monkeypatch, tmp_path, capsys):
+    """Test done command JSON output."""
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+    add_task("Buy groceries")
+    capsys.readouterr()
+
+    mark_done(1, json_output=True)
+
+    output = json.loads(capsys.readouterr().out)
+    assert output == {"task": {"id": 1, "description": "Buy groceries", "done": True}}
