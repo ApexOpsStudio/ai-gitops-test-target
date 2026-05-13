@@ -1,17 +1,12 @@
 """List tasks command."""
 
 import json
-from pathlib import Path
 
-
-def get_tasks_file():
-    """Get path to tasks file."""
-    return Path.home() / ".local" / "share" / "task-cli" / "tasks.json"
+from commands.utils import get_tasks_file
 
 
 def validate_task_file():
     """Validate tasks file exists."""
-    # NOTE: Validation logic scattered here - should be in utils (refactor bounty)
     tasks_file = get_tasks_file()
     if not tasks_file.exists():
         return []
