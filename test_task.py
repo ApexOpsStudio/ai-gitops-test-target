@@ -3,8 +3,8 @@
 import json
 import pytest
 from pathlib import Path
-from commands.add import add_task, validate_description
-from commands.done import validate_task_id
+from commands.add import add_task
+from utils.validation import validate_description, validate_task_id
 
 
 def test_validate_description():
