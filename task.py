@@ -10,15 +10,25 @@ from commands.list import list_tasks
 from commands.done import mark_done
 
 
+DEFAULT_CONFIG = "# Task CLI configuration\nstorage: local\n"
+
+
 def load_config():
-    """Load configuration from file."""
+    """Load configuration from file, creating a default config if missing."""
     config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
+
+    if not config_path.exists():
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+        config_path.write_text(DEFAULT_CONFIG)
+        return DEFAULT_CONFIG
+
     with open(config_path) as f:
         return f.read()
 
 
 def main():
+    load_config()
+
     parser = argparse.ArgumentParser(description="Simple task manager")
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
