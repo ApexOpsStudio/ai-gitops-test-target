@@ -25,22 +25,25 @@ def main():
     # Add command
     add_parser = subparsers.add_parser("add", help="Add a new task")
     add_parser.add_argument("description", help="Task description")
+    add_parser.add_argument("--json", action="store_true", help="Output result as JSON")
 
     # List command
     list_parser = subparsers.add_parser("list", help="List all tasks")
+    list_parser.add_argument("--json", action="store_true", help="Output result as JSON")
 
     # Done command
     done_parser = subparsers.add_parser("done", help="Mark task as complete")
     done_parser.add_argument("task_id", type=int, help="Task ID to mark done")
+    done_parser.add_argument("--json", action="store_true", help="Output result as JSON")
 
     args = parser.parse_args()
 
     if args.command == "add":
-        add_task(args.description)
+        add_task(args.description, json_output=args.json)
     elif args.command == "list":
-        list_tasks()
+        list_tasks(json_output=args.json)
     elif args.command == "done":
-        mark_done(args.task_id)
+        mark_done(args.task_id, json_output=args.json)
     else:
         parser.print_help()
 
