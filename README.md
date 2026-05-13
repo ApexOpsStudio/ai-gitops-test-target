@@ -18,11 +18,23 @@ python task.py --help
 # Add a task
 python task.py add "Buy groceries"
 
+# Add a task and print machine-readable JSON
+python task.py add "Buy groceries" --json
+# {"task": {"id": 1, "description": "Buy groceries", "done": false}, "message": "Added task 1"}
+
 # List tasks
 python task.py list
 
+# List tasks as JSON
+python task.py list --json
+# {"tasks": [{"id": 1, "description": "Buy groceries", "done": false}], "count": 1}
+
 # Complete a task
 python task.py done 1
+
+# Complete a task and print JSON
+python task.py done 1 --json
+# {"task": {"id": 1, "description": "Buy groceries", "done": true}, "message": "Marked task 1 as done"}
 ```
 
 ## Testing
