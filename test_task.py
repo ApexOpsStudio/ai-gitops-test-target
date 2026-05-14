@@ -3,8 +3,8 @@
 import json
 import pytest
 from pathlib import Path
-from commands.add import add_task, validate_description
-from commands.done import validate_task_id
+from commands.add import add_task
+from utils.validation import validate_description, validate_task_file, validate_task_id
 
 
 def test_validate_description():
@@ -28,3 +28,10 @@ def test_validate_task_id():
 
     with pytest.raises(ValueError):
         validate_task_id(tasks, 99)
+
+
+def test_validate_task_file_returns_empty_list_when_missing(tmp_path, monkeypatch):
+    """Test missing task file validation preserves behavior."""
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+
+    assert validate_task_file() == []
