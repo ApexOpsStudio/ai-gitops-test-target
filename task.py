@@ -10,12 +10,35 @@ from commands.list import list_tasks
 from commands.done import mark_done
 
 
+EXAMPLE_CONFIG_PATH = Path(__file__).with_name("config.yaml.example")
+DEFAULT_CONFIG = """# Task storage settings
+storage:
+  format: json
+  max_tasks: 1000
+
+# Display settings
+display:
+  color: true
+  unicode: true
+"""
+
+
+def get_config_path():
+    """Return the user configuration path."""
+    return Path.home() / ".config" / "task-cli" / "config.yaml"
+
+
 def load_config():
     """Load configuration from file."""
-    config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
-    with open(config_path) as f:
-        return f.read()
+    config_path = get_config_path()
+    if not config_path.exists():
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+        if EXAMPLE_CONFIG_PATH.exists():
+            config_path.write_text(EXAMPLE_CONFIG_PATH.read_text())
+        else:
+            config_path.write_text(DEFAULT_CONFIG)
+
+    return config_path.read_text()
 
 
 def main():
