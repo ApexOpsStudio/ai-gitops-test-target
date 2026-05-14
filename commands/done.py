@@ -32,6 +32,7 @@ def mark_done(task_id):
             task["done"] = True
             tasks_file.write_text(json.dumps(tasks, indent=2))
             print(f"Marked task {task_id} as done: {task['description']}")
-            return
+            return task
 
     print(f"Task {task_id} not found")
+    return None

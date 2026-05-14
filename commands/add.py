@@ -35,3 +35,4 @@ def add_task(description):
 
     tasks_file.write_text(json.dumps(tasks, indent=2))
     print(f"Added task {task_id}: {description}")
+    return tasks[-1]

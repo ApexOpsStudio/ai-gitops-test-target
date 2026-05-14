@@ -25,6 +25,19 @@ python task.py list
 python task.py done 1
 ```
 
+### JSON output
+
+```bash
+# Add a task and emit JSON for scripts
+python task.py add "Buy groceries" --json
+
+# List tasks as JSON
+python task.py list --json
+
+# Complete a task and emit JSON
+python task.py done 1 --json
+```
+
 ## Testing
 
 ```bash
