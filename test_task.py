@@ -3,8 +3,11 @@
 import json
 import pytest
 from pathlib import Path
-from commands.add import add_task, validate_description
-from commands.done import validate_task_id
+from commands.add import add_task
+from commands.done import mark_done
+from commands.list import list_tasks
+from utils.paths import get_tasks_file
+from utils.validation import validate_description, validate_task_id, validate_task_file
 
 
 def test_validate_description():
@@ -28,3 +31,49 @@ def test_validate_task_id():
 
     with pytest.raises(ValueError):
         validate_task_id(tasks, 99)
+
+
+def test_validate_task_file():
+    """Test task file validation."""
+    nonexistent = Path("/nonexistent/tasks.json")
+    assert validate_task_file(nonexistent) == []
+
+    tasks_file = Path("/tmp/test-tasks.json")
+    tasks_file.write_text("[]")
+    result = validate_task_file(tasks_file)
+    assert result == tasks_file
+    tasks_file.unlink()
+
+
+def test_get_tasks_file():
+    """Test shared path function."""
+    path = get_tasks_file()
+    assert path.name == "tasks.json"
+    assert "task-cli" in str(path)
+
+
+def test_add_task(tmp_path, monkeypatch):
+    """Test add task uses shared utils."""
+    from utils import paths
+    import commands.add as add_mod
+    task_file = tmp_path / "tasks.json"
+    monkeypatch.setattr(paths, "get_tasks_file", lambda: task_file)
+    monkeypatch.setattr(add_mod, "get_tasks_file", lambda: task_file)
+
+    add_task("test task")
+    assert task_file.exists()
+    tasks = json.loads(task_file.read_text())
+    assert len(tasks) == 1
+    assert tasks[0]["description"] == "test task"
+
+
+def test_mark_done(tmp_path, monkeypatch):
+    """Test mark done uses shared utils."""
+    import commands.done as done_mod
+    task_file = tmp_path / "tasks.json"
+    monkeypatch.setattr(done_mod, "get_tasks_file", lambda: task_file)
+
+    task_file.write_text(json.dumps([{"id": 1, "description": "x", "done": False}]))
+    mark_done(1)
+    tasks = json.loads(task_file.read_text())
+    assert tasks[0]["done"] is True
