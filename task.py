@@ -2,7 +2,6 @@
 """Simple task manager CLI."""
 
 import argparse
-import sys
 from pathlib import Path
 
 from commands.add import add_task
@@ -19,28 +18,50 @@ def load_config():
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Simple task manager")
+    common_parser = argparse.ArgumentParser(add_help=False)
+    common_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Output machine-readable JSON",
+    )
+
+    parser = argparse.ArgumentParser(
+        description="Simple task manager",
+        parents=[common_parser],
+    )
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
     # Add command
-    add_parser = subparsers.add_parser("add", help="Add a new task")
+    add_parser = subparsers.add_parser(
+        "add",
+        help="Add a new task",
+        parents=[common_parser],
+    )
     add_parser.add_argument("description", help="Task description")
 
     # List command
-    list_parser = subparsers.add_parser("list", help="List all tasks")
+    list_parser = subparsers.add_parser(
+        "list",
+        help="List all tasks",
+        parents=[common_parser],
+    )
 
     # Done command
-    done_parser = subparsers.add_parser("done", help="Mark task as complete")
+    done_parser = subparsers.add_parser(
+        "done",
+        help="Mark task as complete",
+        parents=[common_parser],
+    )
     done_parser.add_argument("task_id", type=int, help="Task ID to mark done")
 
     args = parser.parse_args()
 
     if args.command == "add":
-        add_task(args.description)
+        add_task(args.description, json_output=args.json)
     elif args.command == "list":
-        list_tasks()
+        list_tasks(json_output=args.json)
     elif args.command == "done":
-        mark_done(args.task_id)
+        mark_done(args.task_id, json_output=args.json)
     else:
         parser.print_help()
 

@@ -18,11 +18,20 @@ python task.py --help
 # Add a task
 python task.py add "Buy groceries"
 
+# Add a task and get JSON
+python task.py add --json "Buy groceries"
+
 # List tasks
 python task.py list
 
+# List tasks as JSON
+python task.py list --json
+
 # Complete a task
 python task.py done 1
+
+# Complete a task and get JSON
+python task.py done --json 1
 ```
 
 ## Testing
