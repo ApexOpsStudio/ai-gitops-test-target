@@ -1,12 +1,6 @@
 """Add task command."""
 
-import json
-from pathlib import Path
-
-
-def get_tasks_file():
-    """Get path to tasks file."""
-    return Path.home() / ".local" / "share" / "task-cli" / "tasks.json"
+from commands.storage import load_tasks, print_json, save_tasks
 
 
 def validate_description(description):
@@ -19,19 +13,18 @@ def validate_description(description):
     return description.strip()
 
 
-def add_task(description):
+def add_task(description, json_output=False):
     """Add a new task."""
     description = validate_description(description)
 
-    tasks_file = get_tasks_file()
-    tasks_file.parent.mkdir(parents=True, exist_ok=True)
-
-    tasks = []
-    if tasks_file.exists():
-        tasks = json.loads(tasks_file.read_text())
-
+    tasks = load_tasks()
     task_id = len(tasks) + 1
-    tasks.append({"id": task_id, "description": description, "done": False})
+    task = {"id": task_id, "description": description, "done": False}
+    tasks.append(task)
+    save_tasks(tasks)
 
-    tasks_file.write_text(json.dumps(tasks, indent=2))
+    if json_output:
+        print_json({"status": "added", "task": task})
+        return
+
     print(f"Added task {task_id}: {description}")

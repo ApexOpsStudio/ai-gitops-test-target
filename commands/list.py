@@ -1,12 +1,6 @@
 """List tasks command."""
 
-import json
-from pathlib import Path
-
-
-def get_tasks_file():
-    """Get path to tasks file."""
-    return Path.home() / ".local" / "share" / "task-cli" / "tasks.json"
+from commands.storage import get_tasks_file, load_tasks, print_json
 
 
 def validate_task_file():
@@ -18,18 +12,27 @@ def validate_task_file():
     return tasks_file
 
 
-def list_tasks():
+def list_tasks(json_output=False):
     """List all tasks."""
-    # NOTE: No --json flag support yet (feature bounty)
     tasks_file = validate_task_file()
     if not tasks_file:
+        if json_output:
+            print_json({"tasks": []})
+            return
         print("No tasks yet!")
         return
 
-    tasks = json.loads(tasks_file.read_text())
+    tasks = load_tasks()
 
     if not tasks:
+        if json_output:
+            print_json({"tasks": []})
+            return
         print("No tasks yet!")
+        return
+
+    if json_output:
+        print_json({"tasks": tasks})
         return
 
     for task in tasks:
