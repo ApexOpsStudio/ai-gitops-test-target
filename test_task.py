@@ -1,8 +1,8 @@
 """Basic tests for task CLI."""
 
-import json
 import pytest
-from pathlib import Path
+
+import task
 from commands.add import add_task, validate_description
 from commands.done import validate_task_id
 
@@ -28,3 +28,16 @@ def test_validate_task_id():
 
     with pytest.raises(ValueError):
         validate_task_id(tasks, 99)
+
+
+def test_load_config_creates_default_when_missing(tmp_path, monkeypatch):
+    """Missing config should be initialized instead of crashing."""
+    monkeypatch.setattr(task.Path, "home", staticmethod(lambda: tmp_path))
+    config_path = tmp_path / ".config" / "task-cli" / "config.yaml"
+
+    assert not config_path.exists()
+
+    config = task.load_config()
+
+    assert config == task.DEFAULT_CONFIG
+    assert config_path.read_text(encoding="utf-8") == task.DEFAULT_CONFIG
