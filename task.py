@@ -3,19 +3,30 @@
 
 import argparse
 import sys
+import json
 from pathlib import Path
 
 from commands.add import add_task
 from commands.list import list_tasks
 from commands.done import mark_done
 
+DEFAULT_CONFIG = {"tasks_file": "tasks.json", "verbose": False}
+
 
 def load_config():
-    """Load configuration from file."""
+    """Load configuration from file, creating default if missing."""
     config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
-    with open(config_path) as f:
-        return f.read()
+    if not config_path.exists():
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+        config_path.write_text(json.dumps(DEFAULT_CONFIG, indent=2))
+        print(f"Created default config at {config_path}", file=sys.stderr)
+        return DEFAULT_CONFIG
+    try:
+        with open(config_path) as f:
+            return json.load(f) or DEFAULT_CONFIG
+    except (json.JSONDecodeError, OSError) as e:
+        print(f"Error reading config: {e}. Using defaults.", file=sys.stderr)
+        return DEFAULT_CONFIG
 
 
 def main():
