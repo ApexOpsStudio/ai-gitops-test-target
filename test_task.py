@@ -1,10 +1,13 @@
 """Basic tests for task CLI."""
 
 import json
-import pytest
 from pathlib import Path
-from commands.add import add_task, validate_description
-from commands.done import validate_task_id
+
+import pytest
+
+from commands.add import add_task
+from utils.paths import get_tasks_file
+from utils.validation import validate_description, validate_task_file, validate_task_id
 
 
 def test_validate_description():
@@ -28,3 +31,27 @@ def test_validate_task_id():
 
     with pytest.raises(ValueError):
         validate_task_id(tasks, 99)
+
+
+def test_validate_task_file_missing(monkeypatch, tmp_path):
+    """Test missing task file validation returns an empty list."""
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+
+    assert validate_task_file() == []
+
+
+def test_validate_task_file_existing(monkeypatch, tmp_path):
+    """Test existing task file validation returns the task file path."""
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+    tasks_file = get_tasks_file()
+    tasks_file.parent.mkdir(parents=True)
+    tasks_file.write_text(json.dumps([]))
+
+    assert validate_task_file() == tasks_file
+
+
+def test_get_tasks_file(monkeypatch, tmp_path):
+    """Test shared tasks file path helper."""
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+
+    assert get_tasks_file() == tmp_path / ".local" / "share" / "task-cli" / "tasks.json"
