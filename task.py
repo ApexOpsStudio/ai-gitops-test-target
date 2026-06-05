@@ -9,11 +9,20 @@ from commands.add import add_task
 from commands.list import list_tasks
 from commands.done import mark_done
 
+DEFAULT_CONFIG = """# Task CLI configuration
+settings:
+  format: text
+  max_tasks: 1000
+"""
+
 
 def load_config():
     """Load configuration from file."""
     config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
+    if not config_path.exists():
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+        config_path.write_text(DEFAULT_CONFIG)
+
     with open(config_path) as f:
         return f.read()
 
