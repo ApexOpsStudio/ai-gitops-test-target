@@ -33,4 +33,19 @@ python -m pytest test_task.py
 
 ## Configuration
 
-Copy `config.yaml.example` to `~/.config/task-cli/config.yaml` and customize.
+The CLI looks for its config at `~/.config/task-cli/config.yaml`.
+
+If the config file doesn't exist, it will be **automatically created** with sensible defaults:
+
+```yaml
+# Task CLI configuration
+storage:
+  format: json
+  max_tasks: 1000
+
+display:
+  color: true
+  unicode: true
+```
+
+You can also manually copy `config.yaml.example` to customize your settings.
