@@ -11,9 +11,12 @@ from commands.done import mark_done
 
 
 def load_config():
-    """Load configuration from file."""
+    """Load configuration from file, creating defaults if missing."""
     config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
+    if not config_path.exists():
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+        config_path.write_text("# task-cli configuration\n")
+        print(f"Created default config at {config_path}")
     with open(config_path) as f:
         return f.read()
 
