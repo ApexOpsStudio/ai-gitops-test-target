@@ -13,7 +13,12 @@ from commands.done import mark_done
 def load_config():
     """Load configuration from file."""
     config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
+    if not config_path.exists():
+        example_path = Path(__file__).with_name("config.yaml.example")
+        default_config = example_path.read_text() if example_path.exists() else ""
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+        config_path.write_text(default_config)
+
     with open(config_path) as f:
         return f.read()
 
