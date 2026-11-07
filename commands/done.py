@@ -1,48 +1,25 @@
-"""Mark task done command."""
-
-
 import json
-from pathlib import Path
+from storage import load_tasks, save_tasks
+from utils import parse_task_id
 
 
-
-
-def get_tasks_file():
-    """Get path to tasks file."""
-    return Path.home() / ".local" / "share" / "task-cli" / "tasks.json"
-
-
-
-
-def validate_task_id(tasks, task_id):
-    """Validate task ID exists."""
-    # NOTE: Validation logic scattered here - should be in utils (refactor bounty)
-    if task_id < 1 or task_id > len(tasks):
-        raise ValueError(f"Invalid task ID: {task_id}")
-    return task_id
-
-
-
-
-def mark_done(task_id):
-    """Mark a task as complete."""
-    tasks_file = get_tasks_file()
-    if not tasks_file.exists():
-        print("No tasks found!")
+def run(args, json_output=False):
+    if not args:
+        print("Error: task ID required")
         return
-
-
-    tasks = json.loads(tasks_file.read_text())
-    task_id = validate_task_id(tasks, task_id)
-
-
-    for task in tasks:
-        if task["id"] == task_id:
-            task["done"] = True
-            tasks_file.write_text(json.dumps(tasks, indent=2))
-            print(f"Marked task {task_id} as done: {task['description']}")
+    try:
+        task_id = parse_task_id(args[0])
+    except ValueError:
+        print(f"Error: invalid ID '{args[0]}'")
+        return
+    tasks = load_tasks()
+    for t in tasks:
+        if t["id"] == task_id:
+            t["done"] = True
+            save_tasks(tasks)
+            if json_output:
+                print(json.dumps(t))
+            else:
+                print(f"Marked task #{task_id} as done.")
             return
-
-
-    print(f"Task {task_id} not found")
-
+    print(f"Error: task #{task_id} not found")
