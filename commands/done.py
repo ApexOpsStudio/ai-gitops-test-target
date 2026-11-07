@@ -1,12 +1,17 @@
 """Mark task done command."""
 
+
 import json
 from pathlib import Path
+
+
 
 
 def get_tasks_file():
     """Get path to tasks file."""
     return Path.home() / ".local" / "share" / "task-cli" / "tasks.json"
+
+
 
 
 def validate_task_id(tasks, task_id):
@@ -17,6 +22,8 @@ def validate_task_id(tasks, task_id):
     return task_id
 
 
+
+
 def mark_done(task_id):
     """Mark a task as complete."""
     tasks_file = get_tasks_file()
@@ -24,8 +31,10 @@ def mark_done(task_id):
         print("No tasks found!")
         return
 
+
     tasks = json.loads(tasks_file.read_text())
     task_id = validate_task_id(tasks, task_id)
+
 
     for task in tasks:
         if task["id"] == task_id:
@@ -34,4 +43,6 @@ def mark_done(task_id):
             print(f"Marked task {task_id} as done: {task['description']}")
             return
 
+
     print(f"Task {task_id} not found")
+
