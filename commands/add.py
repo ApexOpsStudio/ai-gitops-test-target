@@ -1,49 +1,21 @@
-"""Add task command."""
-
-
 import json
-from pathlib import Path
+from storage import load_tasks, save_tasks
+from utils import sanitize_title
 
 
-
-
-def get_tasks_file():
-    """Get path to tasks file."""
-    return Path.home() / ".local" / "share" / "task-cli" / "tasks.json"
-
-
-
-
-def validate_description(description):
-    """Validate task description."""
-    # NOTE: Validation logic scattered here - should be in utils (refactor bounty)
-    if not description:
-        raise ValueError("Description cannot be empty")
-    if len(description) > 200:
-        raise ValueError("Description too long (max 200 chars)")
-    return description.strip()
-
-
-
-
-def add_task(description):
-    """Add a new task."""
-    description = validate_description(description)
-
-
-    tasks_file = get_tasks_file()
-    tasks_file.parent.mkdir(parents=True, exist_ok=True)
-
-
-    tasks = []
-    if tasks_file.exists():
-        tasks = json.loads(tasks_file.read_text())
-
-
-    task_id = len(tasks) + 1
-    tasks.append({"id": task_id, "description": description, "done": False})
-
-
-    tasks_file.write_text(json.dumps(tasks, indent=2))
-    print(f"Added task {task_id}: {description}")
-
+def run(args, json_output=False):
+    if not args:
+        print("Error: task title required")
+        return
+    title = sanitize_title(" ".join(args))
+    if not title:
+        print("Error: task title required")
+        return
+    tasks = load_tasks()
+    task = {"id": len(tasks) + 1, "title": title, "done": False}
+    tasks.append(task)
+    save_tasks(tasks)
+    if json_output:
+        print(json.dumps(task))
+    else:
+        print(f"Added task #{task['id']}: {title}")
