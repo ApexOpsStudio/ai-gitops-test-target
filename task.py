@@ -1,48 +1,39 @@
 #!/usr/bin/env python3
-"""Simple task manager CLI."""
+"""Simple CLI task manager.
 
-import argparse
+Usage:
+    python task.py [--json] add <title>
+    python task.py [--json] list
+    python task.py [--json] done <id>
+"""
 import sys
-from pathlib import Path
+from commands import add, list as list_cmd, done
+from utils import validate_command
 
-from commands.add import add_task
-from commands.list import list_tasks
-from commands.done import mark_done
-
-
-def load_config():
-    """Load configuration from file."""
-    config_path = Path.home() / ".config" / "task-cli" / "config.yaml"
-    # NOTE: This will crash if config doesn't exist - known bug for bounty testing
-    with open(config_path) as f:
-        return f.read()
+COMMANDS = {
+    "add": add,
+    "list": list_cmd,
+    "done": done,
+}
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Simple task manager")
-    subparsers = parser.add_subparsers(dest="command", help="Command to run")
+    raw_args = sys.argv[1:]
+    json_output = "--json" in raw_args
+    args = [a for a in raw_args if a != "--json"]
 
-    # Add command
-    add_parser = subparsers.add_parser("add", help="Add a new task")
-    add_parser.add_argument("description", help="Task description")
+    if not args or args[0] in ("-h", "--help"):
+        print(__doc__)
+        sys.exit(0)
 
-    # List command
-    list_parser = subparsers.add_parser("list", help="List all tasks")
+    cmd = args[0]
+    cmd_args = args[1:]
 
-    # Done command
-    done_parser = subparsers.add_parser("done", help="Mark task as complete")
-    done_parser.add_argument("task_id", type=int, help="Task ID to mark done")
+    if not validate_command(cmd, COMMANDS):
+        print(f"Unknown command: {cmd}")
+        sys.exit(1)
 
-    args = parser.parse_args()
-
-    if args.command == "add":
-        add_task(args.description)
-    elif args.command == "list":
-        list_tasks()
-    elif args.command == "done":
-        mark_done(args.task_id)
-    else:
-        parser.print_help()
+    COMMANDS[cmd].run(cmd_args, json_output=json_output)
 
 
 if __name__ == "__main__":
