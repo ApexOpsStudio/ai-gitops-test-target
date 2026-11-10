@@ -8,7 +8,7 @@ from utils.validation import validate_description
 __all__ = ["add_task", "get_tasks_file", "validate_description"]
 
 
-def add_task(description):
+def add_task(description, as_json=False):
     """Add a new task."""
     description = validate_description(description)
 
@@ -20,7 +20,11 @@ def add_task(description):
         tasks = json.loads(tasks_file.read_text())
 
     task_id = len(tasks) + 1
-    tasks.append({"id": task_id, "description": description, "done": False})
+    task = {"id": task_id, "description": description, "done": False}
+    tasks.append(task)
 
     tasks_file.write_text(json.dumps(tasks, indent=2))
-    print(f"Added task {task_id}: {description}")
+    if as_json:
+        print(json.dumps({"status": "added", **task}))
+    else:
+        print(f"Added task {task_id}: {description}")
