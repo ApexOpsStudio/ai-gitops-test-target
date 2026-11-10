@@ -28,3 +28,18 @@ def test_validate_task_id():
 
     with pytest.raises(ValueError):
         validate_task_id(tasks, 99)
+
+
+def test_load_config_creates_default_when_missing(tmp_path, monkeypatch):
+    """load_config must not crash when the config file is missing."""
+    import task
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+
+    config_path = tmp_path / ".config" / "task-cli" / "config.yaml"
+    assert not config_path.exists()
+
+    content = task.load_config()
+    assert config_path.exists()
+    assert "storage:" in content
+    # second call reads the file back without error
+    assert task.load_config() == content
