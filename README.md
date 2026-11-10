@@ -25,6 +25,21 @@ python task.py list
 python task.py done 1
 ```
 
+### JSON output
+
+Every command supports a `--json` flag for scripting and automation:
+
+```bash
+python task.py add "Buy groceries" --json
+# {"status": "added", "id": 1, "description": "Buy groceries", "done": false}
+
+python task.py list --json
+# {"tasks": [{"id": 1, "description": "Buy groceries", "done": false}]}
+
+python task.py done 1 --json
+# {"status": "done", "id": 1, "description": "Buy groceries", "done": true}
+```
+
 ## Testing
 
 ```bash
